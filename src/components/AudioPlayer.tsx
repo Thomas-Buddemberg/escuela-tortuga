@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { getAllInOrder, replaceWithFiles } from "../lib/audio/db";
 
-type Track = { name: string; url: string };
+type Track = { id: number; name: string; url: string };
 
 function formatTime(sec: number): string {
   if (!Number.isFinite(sec) || sec < 0) return "0:00";
@@ -21,21 +22,57 @@ export default function AudioPlayer() {
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
   const [hidden, setHidden] = useState<boolean>(false);
+  const [volume, setVolume] = useState<number>(1);
+  const [muted, setMuted] = useState<boolean>(false);
 
   const currentTrack = useMemo(() => tracks[currentIndex], [tracks, currentIndex]);
 
-  // Restore "hidden" from localStorage
+  // Restore UI prefs from localStorage
   useEffect(() => {
     try {
-      const v = localStorage.getItem("audio:hidden");
-      if (v === "1") setHidden(true);
+      const vHidden = localStorage.getItem("audio:hidden");
+      if (vHidden === "1") setHidden(true);
+      const vVol = localStorage.getItem("audio:volume");
+      if (vVol) setVolume(Math.max(0, Math.min(1, Number(vVol))));
+      const vMuted = localStorage.getItem("audio:muted");
+      if (vMuted) setMuted(vMuted === "1");
     } catch {}
   }, []);
   useEffect(() => {
-    try {
-      localStorage.setItem("audio:hidden", hidden ? "1" : "0");
-    } catch {}
+    try { localStorage.setItem("audio:hidden", hidden ? "1" : "0"); } catch {}
   }, [hidden]);
+  useEffect(() => {
+    try { localStorage.setItem("audio:volume", String(volume)); } catch {}
+  }, [volume]);
+  useEffect(() => {
+    try { localStorage.setItem("audio:muted", muted ? "1" : "0"); } catch {}
+  }, [muted]);
+
+  // Load playlist from IndexedDB on mount
+  useEffect(() => {
+    (async () => {
+      try {
+        const stored = await getAllInOrder();
+        if (stored && stored.length) {
+          const loaded: Track[] = stored.map((s: any) => ({
+            id: s.id as number,
+            name: s.name as string,
+            url: URL.createObjectURL(s.blob as Blob),
+          }));
+          setTracks(loaded);
+          setCurrentIndex(0);
+        }
+      } catch {}
+    })();
+  }, []);
+
+  // Apply volume/mute to element
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.volume = Number.isFinite(volume) ? Math.max(0, Math.min(1, volume)) : 1;
+    audio.muted = !!muted;
+  }, [volume, muted]);
 
   // Set source when track changes
   useEffect(() => {
@@ -46,7 +83,6 @@ export default function AudioPlayer() {
       audio.load();
       setCurrentTime(0);
       setDuration(0);
-      // Autoplay if already in "playing" state
       if (isPlaying) {
         void audio.play().catch(() => setIsPlaying(false));
       }
@@ -57,7 +93,8 @@ export default function AudioPlayer() {
       setDuration(0);
       setIsPlaying(false);
     }
-  }, [currentTrack?.url]); // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentTrack?.url]);
 
   // Bind audio events
   useEffect(() => {
@@ -69,7 +106,7 @@ export default function AudioPlayer() {
     const onPlay = () => setIsPlaying(true);
     const onPause = () => setIsPlaying(false);
     const onEnded = () => {
-      // stop at end (no auto-next unless you want it)
+      // stop at end (no auto-next unless wanted)
       audio.currentTime = 0;
       audio.pause();
     };
@@ -92,19 +129,17 @@ export default function AudioPlayer() {
   // Clean up object URLs when replacing playlist or unmounting
   useEffect(() => {
     return () => {
-      tracks.forEach(t => URL.revokeObjectURL(t.url));
+      tracks.forEach((t) => URL.revokeObjectURL(t.url));
     };
   }, [tracks]);
 
+  const SEEK_STEP = 30; // seconds
+
   const handlePlayPause = () => {
     const audio = audioRef.current;
-    if (!audio) return;
-    if (!currentTrack) return;
-    if (audio.paused) {
-      void audio.play().catch(() => setIsPlaying(false));
-    } else {
-      audio.pause();
-    }
+    if (!audio || !currentTrack) return;
+    if (audio.paused) void audio.play().catch(() => setIsPlaying(false));
+    else audio.pause();
   };
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -113,8 +148,6 @@ export default function AudioPlayer() {
     const next = Number(e.target.value);
     audio.currentTime = Number.isFinite(next) ? next : 0;
   };
-
-  const SEEK_STEP = 30; // seconds
 
   const handleBack = () => {
     const audio = audioRef.current;
@@ -129,22 +162,29 @@ export default function AudioPlayer() {
     audio.currentTime = Math.min(end, audio.currentTime + SEEK_STEP);
   };
 
-  const openFilePicker = () => {
-    fileInputRef.current?.click();
+  const handlePrevTrack = () => {
+    if (!tracks.length) return;
+    setCurrentIndex((i) => (i - 1 + tracks.length) % tracks.length);
   };
 
-  const onFilesSelected = (files: FileList | null) => {
+  const handleNextTrack = () => {
+    if (!tracks.length) return;
+    setCurrentIndex((i) => (i + 1) % tracks.length);
+  };
+
+  const toggleMute = () => setMuted((m) => !m);
+
+  const openFilePicker = () => fileInputRef.current?.click();
+
+  const onFilesSelected = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
 
     // Revoke existing URLs
-    tracks.forEach(t => URL.revokeObjectURL(t.url));
+    tracks.forEach((t) => URL.revokeObjectURL(t.url));
 
-    const newTracks: Track[] = Array.from(files).map(f => ({
-      name: f.name,
-      url: URL.createObjectURL(f),
-    }));
-
-    setTracks(newTracks);
+    // Persist in IndexedDB and get new ids + URLs
+    const saved = await replaceWithFiles(files);
+    setTracks(saved);
     setCurrentIndex(0);
     setIsPlaying(false);
   };
@@ -199,6 +239,15 @@ export default function AudioPlayer() {
           </button>
 
           <button
+            onClick={handlePrevTrack}
+            aria-label="Previous track"
+            className="rounded-md bg-neutral-800 px-3 py-2 hover:bg-neutral-700 active:scale-95"
+            disabled={tracks.length === 0}
+          >
+            Prev
+          </button>
+
+          <button
             onClick={handleBack}
             aria-label="Seek backward 30 seconds"
             className="rounded-md bg-neutral-800 px-3 py-2 hover:bg-neutral-700 active:scale-95"
@@ -225,6 +274,15 @@ export default function AudioPlayer() {
             +30s
           </button>
 
+          <button
+            onClick={handleNextTrack}
+            aria-label="Next track"
+            className="rounded-md bg-neutral-800 px-3 py-2 hover:bg-neutral-700 active:scale-95"
+            disabled={tracks.length === 0}
+          >
+            Next
+          </button>
+
           <div className="flex items-center gap-2 flex-1 min-w-[160px]">
             <input
               type="range"
@@ -239,12 +297,36 @@ export default function AudioPlayer() {
             />
           </div>
 
+          <div className="flex items-center gap-2 min-w-[150px]">
+            <button
+              onClick={toggleMute}
+              aria-label={muted ? "Unmute" : "Mute"}
+              className="rounded-md bg-neutral-800 px-2 py-2 hover:bg-neutral-700 active:scale-95"
+            >
+              {muted ? "Unmute" : "Mute"}
+            </button>
+            <input
+              type="range"
+              min={0}
+              max={1}
+              step={0.01}
+              value={muted ? 0 : volume}
+              onChange={(e) => {
+                const v = Number(e.target.value);
+                setVolume(v);
+                if (muted && v > 0) setMuted(false);
+              }}
+              aria-label="Volume"
+              className="w-24"
+            />
+          </div>
+
           <div className="text-xs tabular-nums min-w-[120px] text-right">
             {formatTime(currentTime)} / {formatTime(duration)}
           </div>
 
           <div className="truncate max-w-[28ch] text-xs text-neutral-300">
-            {currentTrack ? currentTrack.name : "No file selected"}
+            {currentTrack ? `${currentIndex + 1}/${tracks.length} · ${currentTrack.name}` : "No file selected"}
           </div>
         </div>
       </footer>
