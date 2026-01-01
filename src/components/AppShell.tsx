@@ -1,18 +1,12 @@
-import Navbar from "@/components/Navbar";
+import type { ReactNode } from "react";
+import dynamic from "next/dynamic";
+const AudioPlayer = dynamic(() => import("./AudioPlayer"), { ssr: false });
 
-export default function AppShell({ children }: { children: React.ReactNode }) {
+export default function AppShell({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen">
-      <Navbar />
-      <main className="mx-auto max-w-3xl px-4 pb-24 pt-6">
-        {children}
-      </main>
-      <footer className="mx-auto max-w-3xl px-4 pb-8 text-xs text-white/55">
-        <p>
-          Turtle Ki es una herramienta de hábito. Ajusta intensidades y cuida técnica. Si tienes dolor o condición médica,
-          consulta a un profesional.
-        </p>
-      </footer>
+    <div className="min-h-screen flex flex-col">
+      {children}
+      <AudioPlayer />
     </div>
   );
 }
