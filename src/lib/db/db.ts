@@ -59,7 +59,7 @@ export async function seedIfNeeded(): Promise<void> {
 }
 
 export async function hardResetAll(): Promise<void> {
-  await db.transaction("rw", db.player, db.settings, db.actions, db.quests, db.workouts, async () => {
+  await db.transaction("rw", [db.player, db.settings, db.actions, db.quests, db.workouts], async () => {
     await Promise.all([
       db.player.clear(),
       db.settings.clear(),
@@ -86,7 +86,7 @@ export async function exportAllData(): Promise<Record<string, unknown>> {
 export async function importAllData(payload: any): Promise<void> {
   if (!payload || typeof payload !== "object") throw new Error("Payload inválido");
 
-  await db.transaction("rw", db.player, db.settings, db.actions, db.quests, db.workouts, async () => {
+  await db.transaction("rw", [db.player, db.settings, db.actions, db.quests, db.workouts], async () => {
     await Promise.all([
       db.player.clear(),
       db.settings.clear(),

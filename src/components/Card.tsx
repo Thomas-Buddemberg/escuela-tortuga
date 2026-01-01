@@ -5,7 +5,7 @@ export default function Card({
 }: {
   title?: string;
   right?: React.ReactNode;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }) {
   return (
     <section className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-soft">
@@ -15,7 +15,7 @@ export default function Card({
           {right}
         </header>
       ) : null}
-      {children}
+      {children ?? null}
     </section>
   );
 }
