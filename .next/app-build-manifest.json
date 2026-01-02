@@ -23,7 +23,7 @@
       "static/chunks/23-ae7220c84e73ed99.js",
       "static/chunks/main-app-9dace38bcd3ddf74.js",
       "static/chunks/635-9d2c2877fe386d4d.js",
-      "static/chunks/173-39e121ad416a171d.js",
+      "static/chunks/173-32acc682beea3e86.js",
       "static/chunks/app/capsule/page-c8d882ba73d4e0e5.js"
     ],
     "/dojo/page": [
@@ -32,15 +32,7 @@
       "static/chunks/23-ae7220c84e73ed99.js",
       "static/chunks/main-app-9dace38bcd3ddf74.js",
       "static/chunks/635-9d2c2877fe386d4d.js",
-      "static/chunks/app/dojo/page-e42440115db3c1d9.js"
-    ],
-    "/progress/page": [
-      "static/chunks/webpack-facfb64f78722460.js",
-      "static/chunks/fd9d1056-95542c12c8153870.js",
-      "static/chunks/23-ae7220c84e73ed99.js",
-      "static/chunks/main-app-9dace38bcd3ddf74.js",
-      "static/chunks/635-9d2c2877fe386d4d.js",
-      "static/chunks/app/progress/page-45a996a745bc8ed6.js"
+      "static/chunks/app/dojo/page-cc1b51c4fb2f790f.js"
     ],
     "/page": [
       "static/chunks/webpack-facfb64f78722460.js",
@@ -49,7 +41,7 @@
       "static/chunks/main-app-9dace38bcd3ddf74.js",
       "static/chunks/635-9d2c2877fe386d4d.js",
       "static/chunks/138-51b07e5196eb6c46.js",
-      "static/chunks/173-39e121ad416a171d.js",
+      "static/chunks/173-32acc682beea3e86.js",
       "static/chunks/app/page-4a33fb0bcb5410fc.js"
     ],
     "/workout/page": [
@@ -58,8 +50,16 @@
       "static/chunks/23-ae7220c84e73ed99.js",
       "static/chunks/main-app-9dace38bcd3ddf74.js",
       "static/chunks/635-9d2c2877fe386d4d.js",
-      "static/chunks/173-39e121ad416a171d.js",
+      "static/chunks/173-32acc682beea3e86.js",
       "static/chunks/app/workout/page-498871865f948cad.js"
+    ],
+    "/progress/page": [
+      "static/chunks/webpack-facfb64f78722460.js",
+      "static/chunks/fd9d1056-95542c12c8153870.js",
+      "static/chunks/23-ae7220c84e73ed99.js",
+      "static/chunks/main-app-9dace38bcd3ddf74.js",
+      "static/chunks/635-9d2c2877fe386d4d.js",
+      "static/chunks/app/progress/page-e169f4023e8bdb5a.js"
     ],
     "/settings/page": [
       "static/chunks/webpack-facfb64f78722460.js",
@@ -67,7 +67,7 @@
       "static/chunks/23-ae7220c84e73ed99.js",
       "static/chunks/main-app-9dace38bcd3ddf74.js",
       "static/chunks/635-9d2c2877fe386d4d.js",
-      "static/chunks/173-39e121ad416a171d.js",
+      "static/chunks/173-32acc682beea3e86.js",
       "static/chunks/app/settings/page-a76bf8042e3209e5.js"
     ]
   }
