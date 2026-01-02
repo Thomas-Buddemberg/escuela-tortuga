@@ -91,6 +91,7 @@ export interface WorkoutExercise {
   timeSec?: number;
   restSec: number;
   tips?: string[];
+  description?: string; // instrucciones breves para el Dojo
   minKi: number;
   tags: string[];
 }

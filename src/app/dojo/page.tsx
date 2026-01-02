@@ -57,6 +57,11 @@ export default function DojoPage() {
                     <div className="text-xs text-white/60">
                       {spec} • descanso {e.restSec}s • min KI {e.minKi}
                     </div>
+                    {e.description ? (
+                      <div className="mt-1 text-xs text-white/70">
+                        {e.description}
+                      </div>
+                    ) : null}
                     <div className="mt-1 text-[11px] text-white/55">
                       Tags: {e.tags.join(", ")}
                     </div>
