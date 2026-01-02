@@ -3,6 +3,8 @@ import type { KiActionType, SettingsState } from "./models";
 export const ACTION_KI: Record<KiActionType, number> = {
   workout_quick: 10,
   workout_full: 20,
+  capsule_30: 20,
+  capsule_60: 40,
   walk: 5,
   mobility: 5,
   sleep: 5,

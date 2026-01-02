@@ -125,7 +125,9 @@ export default function ProgressPage() {
                     <div className="text-sm font-semibold">{w.dateISO}</div>
                     <div className="text-[11px] text-white/55">Plantilla {w.templateId}</div>
                   </div>
-                  <div className="text-xs text-white/60">Modo: {w.mode}</div>
+                  <div className="text-xs text-white/60">
+                    Modo: {w.mode === "capsule_30" ? "Orgullo 30m" : w.mode === "capsule_60" ? "Orgullo 60m" : w.mode}
+                  </div>
                 </div>
               </div>
             ))

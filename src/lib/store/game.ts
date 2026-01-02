@@ -218,6 +218,108 @@ export async function completeWorkout(params: {
   });
 }
 
+/**
+ * Completa entrenamiento "Nave Capsule Corp."
+ * - Dos variantes: 30 min (+20 KI) o 60 min (+40 KI)
+ * - Comparte lógica de streak y cap con completeWorkout
+ */
+export async function completeCapsuleWorkout(params: {
+  todayISO: string;
+  templateId: string; // identifica la rutina (p.ej. capsule_gym_basic)
+  variant: "capsule_30" | "capsule_60";
+  durationSec?: number;
+}): Promise<{ kiAdded: number; streak: number; bonusKi: number; message: string }> {
+  const { todayISO, templateId, variant, durationSec } = params;
+  const type: KiActionType = variant;
+
+  if (await alreadyClaimedToday(todayISO, type)) {
+    await db.workouts.add({
+      dateISO: todayISO,
+      templateId,
+      completedAtISO: new Date().toISOString(),
+      durationSec,
+      mode: variant
+    } as WorkoutLog);
+
+    const p = await getPlayerOrThrow();
+    return { kiAdded: 0, streak: p.streak, bonusKi: 0, message: "Workout guardado. El KI ya fue reclamado hoy." };
+  }
+
+  return await db.transaction("rw", db.player, db.settings, db.actions, db.workouts, async () => {
+    const [p, s] = await Promise.all([getPlayerOrThrow(), getSettingsOrThrow()]);
+    const now = new Date().toISOString();
+
+    // KI con cap
+    const base = ACTION_KI[type] ?? 0;
+    let kiDelta = base;
+    let capped = false;
+    const remaining = Math.max(0, s.dailyKiCap - p.kiToday);
+    if (remaining <= 0) {
+      kiDelta = 0;
+      capped = true;
+    } else if (kiDelta > remaining) {
+      kiDelta = remaining;
+      capped = true;
+    }
+
+    // Streak
+    let nextStreak = p.streak;
+    let bonusKi = 0;
+    const trainedTodayAlready = p.lastTrainingISO === todayISO;
+    if (!trainedTodayAlready) {
+      if (p.lastTrainingISO && isYesterdayISO(p.lastTrainingISO, todayISO)) nextStreak = p.streak + 1;
+      else nextStreak = 1;
+      if (nextStreak > 0 && nextStreak % 7 === 0) {
+        bonusKi = ACTION_KI["streak_bonus"] ?? 0;
+      }
+    }
+
+    const nextPlayer: PlayerState = {
+      ...p,
+      kiTotal: p.kiTotal + kiDelta + bonusKi,
+      kiToday: p.kiToday + kiDelta + bonusKi,
+      streak: nextStreak,
+      lastTrainingISO: todayISO,
+      updatedAtISO: now
+    };
+    await db.player.put(nextPlayer);
+
+    await db.actions.add({
+      dateISO: todayISO,
+      type,
+      kiDelta,
+      createdAtISO: now,
+      note: templateId
+    });
+
+    if (bonusKi > 0) {
+      await db.actions.add({
+        dateISO: todayISO,
+        type: "streak_bonus",
+        kiDelta: bonusKi,
+        createdAtISO: now,
+        note: `streak=${nextStreak}`
+      });
+    }
+
+    await db.workouts.add({
+      dateISO: todayISO,
+      templateId,
+      completedAtISO: now,
+      durationSec,
+      mode: variant
+    } as WorkoutLog);
+
+    const message = kiDelta > 0
+      ? `Orgullo Saiyajin completado: +${kiDelta} KI${bonusKi ? ` +${bonusKi} KI bonus` : ""} ✅`
+      : capped
+      ? `Entrenamiento guardado. Cap diario alcanzado; hoy no se suma más KI 🐢`
+      : `Entrenamiento guardado.`;
+
+    return { kiAdded: kiDelta, streak: nextStreak, bonusKi, message };
+  });
+}
+
 export async function setDailyKiCap(cap: number): Promise<void> {
   await db.transaction("rw", db.settings, async () => {
     const s = await getSettingsOrThrow();

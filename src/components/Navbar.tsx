@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const tabs = [
   { href: "/", label: "Inicio" },
   { href: "/workout", label: "Entrenar" },
+  { href: "/capsule", label: "Orgullo Saiyajin" },
   { href: "/progress", label: "Progreso" },
   { href: "/dojo", label: "Dojo" },
   { href: "/settings", label: "Ajustes" }

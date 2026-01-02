@@ -8,6 +8,7 @@ import { useState } from "react";
 import { usePlayer } from "@/lib/store/hooks";
 import { setDailyKiCap, setDifficulty, setReduceMotion } from "@/lib/store/game";
 import { exportAllData, hardResetAll, importAllData } from "@/lib/db/db";
+import pkg from "../../../package.json";
 
 export default function SettingsPage() {
   const { player, settings, loading } = usePlayer();
@@ -150,6 +151,12 @@ export default function SettingsPage() {
               <Button variant="danger" onClick={resetAll}>Borrar todo</Button>
             </div>
           </div>
+        </div>
+      </Card>
+
+      <Card title="Acerca de">
+        <div className="text-sm">
+          Versión de la app: v{pkg.version}
         </div>
       </Card>
     </div>

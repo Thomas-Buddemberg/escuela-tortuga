@@ -15,6 +15,8 @@ export type TransformationKey =
 export type KiActionType =
   | "workout_quick"
   | "workout_full"
+  | "capsule_30"
+  | "capsule_60"
   | "walk"
   | "mobility"
   | "sleep"
@@ -99,5 +101,5 @@ export interface WorkoutLog {
   templateId: string;
   completedAtISO: string;
   durationSec?: number;
-  mode: "quick" | "full";
+  mode: "quick" | "full" | "capsule_30" | "capsule_60";
 }

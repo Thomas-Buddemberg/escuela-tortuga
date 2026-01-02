@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { getAllInOrder, replaceWithFiles } from "../lib/audio/db";
+import { getAllInOrder, replaceWithFiles } from "@/lib/audio/db";
 
 type Track = { id: number; name: string; url: string };
 
