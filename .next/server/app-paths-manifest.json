@@ -4,7 +4,7 @@
   "/dojo/page": "app/dojo/page.js",
   "/manifest.webmanifest/route": "app/manifest.webmanifest/route.js",
   "/progress/page": "app/progress/page.js",
-  "/settings/page": "app/settings/page.js",
+  "/page": "app/page.js",
   "/workout/page": "app/workout/page.js",
-  "/page": "app/page.js"
+  "/settings/page": "app/settings/page.js"
 }
