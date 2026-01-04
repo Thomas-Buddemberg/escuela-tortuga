@@ -7,7 +7,7 @@ const tabs = [
   { href: "/", label: "Inicio" },
   { href: "/workout", label: "Entrenar" },
   { href: "/orgullo", label: "Orgullo Saiyajin" },
-  { href: "/progress", label: "Progreso" },
+  { href: "/progreso", label: "Progreso" },
   { href: "/dojo", label: "Dojo" },
   { href: "/settings", label: "Ajustes" }
 ];
