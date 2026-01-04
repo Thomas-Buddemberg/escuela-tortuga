@@ -6,6 +6,6 @@
   "/orgullo/page": "app/orgullo/page.js",
   "/page": "app/page.js",
   "/progress/page": "app/progress/page.js",
-  "/workout/page": "app/workout/page.js",
-  "/settings/page": "app/settings/page.js"
+  "/settings/page": "app/settings/page.js",
+  "/workout/page": "app/workout/page.js"
 }

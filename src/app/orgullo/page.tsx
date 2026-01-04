@@ -22,20 +22,75 @@ type Variant = "capsule_30" | "capsule_60";
 function useCountdown(variant: Variant, active: boolean) {
   const base = variant === "capsule_60" ? 3600 : 1800; // 60 min o 30 min
   const [remaining, setRemaining] = useState<number>(base);
+  const [endAtMs, setEndAtMs] = useState<number | null>(null);
+  const date = todayISO();
+  const storageKey = `capsuleTimerV1_${variant}`;
 
-  // Reset al cambiar variante
+  // Cargar estado persistido por variante y fecha
   useEffect(() => {
-    setRemaining(base);
-  }, [variant]);
+    try {
+      const raw = localStorage.getItem(storageKey);
+      if (raw) {
+        const d = JSON.parse(raw);
+        if (d && d.dateISO === date) {
+          setRemaining(typeof d.remaining === "number" ? d.remaining : base);
+          setEndAtMs(typeof d.endAtMs === "number" ? d.endAtMs : null);
+        } else {
+          localStorage.removeItem(storageKey);
+          setRemaining(base);
+          setEndAtMs(null);
+        }
+      } else {
+        setRemaining(base);
+        setEndAtMs(null);
+      }
+    } catch {
+      setRemaining(base);
+      setEndAtMs(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storageKey, date, base]);
+
+  // Arrancar/pausar según "active"
+  useEffect(() => {
+    if (active) {
+      setEndAtMs(Date.now() + remaining * 1000);
+    } else {
+      if (endAtMs) {
+        const now = Date.now();
+        const r = Math.max(0, Math.floor((endAtMs - now) / 1000));
+        setRemaining(r);
+        setEndAtMs(null);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active]);
 
   // Tick hacia abajo
   useEffect(() => {
     if (!active) return;
-    const id = window.setInterval(() => setRemaining((s) => Math.max(0, s - 1)), 1000);
+    const compute = () => {
+      const now = Date.now();
+      const r = endAtMs ? Math.max(0, Math.floor((endAtMs - now) / 1000)) : remaining;
+      setRemaining(r);
+    };
+    compute();
+    const id = window.setInterval(compute, 1000);
     return () => window.clearInterval(id);
-  }, [active]);
+  }, [active, endAtMs]);
 
-  const reset = () => setRemaining(base);
+  // Persistir
+  useEffect(() => {
+    try {
+      localStorage.setItem(storageKey, JSON.stringify({ dateISO: date, remaining, endAtMs }));
+    } catch {}
+  }, [storageKey, date, remaining, endAtMs]);
+
+  const reset = () => {
+    setRemaining(base);
+    setEndAtMs(null);
+    try { localStorage.removeItem(storageKey); } catch {}
+  };
   return { remaining, base, reset };
 }
 
@@ -119,6 +174,21 @@ export default function OrgulloPage() {
   const { remaining, base, reset } = useCountdown(variant, started);
 
   const dateISO = todayISO();
+  const storageKey = `capsuleTimerV1_${variant}`;
+
+  // Si había un temporizador activo y no ha expirado, reanudar automáticamente
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(storageKey);
+      if (raw) {
+        const d = JSON.parse(raw);
+        if (d && d.dateISO === dateISO && typeof d.endAtMs === "number" && d.endAtMs > Date.now()) {
+          setStarted(true);
+        }
+      }
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storageKey, dateISO]);
 
   // Notificar fin de tiempo
   useEffect(() => {

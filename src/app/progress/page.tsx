@@ -3,24 +3,18 @@
 import Card from "@/components/Card";
 import ProgressBar from "@/components/ProgressBar";
 import StatPill from "@/components/StatPill";
+import LineChart from "@/components/LineChart";
 
 import { useMemo } from "react";
-import { usePlayer, useRecentActions, useWorkouts } from "@/lib/store/hooks";
+import { usePlayer, useAllActions, useWorkouts } from "@/lib/store/hooks";
 import { TRANSFORMATIONS, getTransformation } from "@/lib/game/transformations";
 import { progressToNext } from "@/lib/game/progression";
+import { addDaysISO, parseISODate, todayISO } from "@/lib/date";
 
-function groupByDate(actions: any[]) {
-  const map = new Map<string, number>();
-  for (const a of actions) {
-    const prev = map.get(a.dateISO) ?? 0;
-    map.set(a.dateISO, prev + (a.kiDelta ?? 0));
-  }
-  return Array.from(map.entries()).sort((a, b) => (a[0] < b[0] ? 1 : -1));
-}
 
 export default function ProgressPage() {
   const { player, settings, loading } = usePlayer();
-  const recentActions = useRecentActions(60);
+  const actions = useAllActions();
   const recentWorkouts = useWorkouts(30);
 
   const current = useMemo(() => (player ? getTransformation(player.kiTotal) : null), [player]);
@@ -34,7 +28,46 @@ export default function ProgressPage() {
     );
   }
 
-  const daily = groupByDate(recentActions).slice(0, 14);
+  // Serie continua histórica por día (incluye días con 0 KI)
+  const today = todayISO();
+  const byDateSum = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const a of actions) {
+      const cur = m.get(a.dateISO) ?? 0;
+      m.set(a.dateISO, cur + (a.kiDelta ?? 0));
+    }
+    return m;
+  }, [actions]);
+
+  const daysAsc = useMemo(() => {
+    if (actions.length === 0) return [] as string[];
+    let first = actions[0]?.dateISO ?? today;
+    if (!first || first > today) first = today;
+    const arr: string[] = [];
+    let cursor = first;
+    while (cursor <= today) {
+      arr.push(cursor);
+      cursor = addDaysISO(cursor, 1);
+    }
+    return arr;
+  }, [actions, today]);
+
+  const dailySeries = useMemo(() => {
+    return daysAsc.map((d) => ({
+      dateISO: d,
+      y: byDateSum.get(d) ?? 0,
+      x: parseISODate(d).getTime(),
+    }));
+  }, [daysAsc, byDateSum]);
+
+  const cumulativeSeries = useMemo(() => {
+    let acc = 0;
+    return dailySeries.map((p) => {
+      acc += p.y;
+      return { x: p.x, y: acc, dateISO: p.dateISO } as any;
+    });
+  }, [dailySeries]);
+
 
   return (
     <div className="space-y-4">
@@ -98,17 +131,46 @@ export default function ProgressPage() {
         </div>
       </Card>
 
-      <Card title="KI ganado (últimos 14 días)">
+      <Card title="KI diario (histórico)">
         <div className="space-y-2">
-          {daily.length === 0 ? (
-            <div className="text-sm text-white/70">Aún no hay historial. Entrena o completa misiones 🐢</div>
+          {dailySeries.length === 0 || dailySeries.every((p) => p.y === 0) ? (
+            <div className="text-sm text-white/70">Aún no hay historial suficiente para graficar. ¡Empieza a sumar KI! 🐢</div>
           ) : (
-            daily.map(([dateISO, ki]) => (
-              <div key={dateISO} className="flex items-center justify-between rounded-xl border border-white/10 bg-black/20 px-3 py-2">
-                <div className="text-xs text-white/60">{dateISO}</div>
-                <div className="text-sm font-semibold">+{ki} KI</div>
+            <div className="rounded-2xl border border-white/10 bg-black/20 p-3">
+              <LineChart
+                data={dailySeries.map((p, i) => ({ x: i, y: p.y }))}
+                height={180}
+                stroke="#8bd5ff"
+                fill="#8bd5ff22"
+                className="w-full"
+              />
+              <div className="mt-2 flex items-center justify-between text-[11px] text-white/55">
+                <span>{daysAsc[0]}</span>
+                <span>{daysAsc[daysAsc.length - 1]}</span>
               </div>
-            ))
+            </div>
+          )}
+        </div>
+      </Card>
+
+      <Card title="KI acumulado (histórico)">
+        <div className="space-y-2">
+          {cumulativeSeries.length === 0 || cumulativeSeries.every((p) => p.y === 0) ? (
+            <div className="text-sm text-white/70">Aún no hay historial suficiente para graficar.</div>
+          ) : (
+            <div className="rounded-2xl border border-white/10 bg-black/20 p-3">
+              <LineChart
+                data={cumulativeSeries.map((p, i) => ({ x: i, y: p.y }))}
+                height={180}
+                stroke="#87e2a5"
+                fill="#87e2a522"
+                className="w-full"
+              />
+              <div className="mt-2 flex items-center justify-between text-[11px] text-white/55">
+                <span>{daysAsc[0]}</span>
+                <span>{daysAsc[daysAsc.length - 1]}</span>
+              </div>
+            </div>
           )}
         </div>
       </Card>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Card from "@/components/Card";
 import Button from "@/components/Button";
 import Toast from "@/components/Toast";
@@ -23,8 +23,10 @@ export default function WorkoutPage() {
   const [toast, setToast] = useState<string | null>(null);
 
   const [started, setStarted] = useState(false);
+  const [startAtMs, setStartAtMs] = useState<number | null>(null);
+  const [offsetSec, setOffsetSec] = useState(0);
   const [elapsedSec, setElapsedSec] = useState(0);
-  const tickRef = useRef<number | null>(null);
+  const WORKOUT_SESSION_KEY = "workoutSessionV1";
 
   const plan = useMemo(() => {
     if (!player || !settings) return null;
@@ -34,19 +36,57 @@ export default function WorkoutPage() {
   const [done, setDone] = useState<Record<string, number>>({}); // exerciseId -> sets done
 
   useEffect(() => {
-    if (!started) return;
-    tickRef.current = window.setInterval(() => setElapsedSec((s) => s + 1), 1000);
-    return () => {
-      if (tickRef.current) window.clearInterval(tickRef.current);
-      tickRef.current = null;
+    // Restaurar sesión del entrenamiento si existe para la fecha actual
+    try {
+      const raw = localStorage.getItem(WORKOUT_SESSION_KEY);
+      if (raw) {
+        const d = JSON.parse(raw);
+        if (d && d.dateISO === dateISO) {
+          setStarted(!!d.started);
+          setStartAtMs(typeof d.startAtMs === "number" ? d.startAtMs : null);
+          setOffsetSec(typeof d.offsetSec === "number" ? d.offsetSec : 0);
+        } else {
+          localStorage.removeItem(WORKOUT_SESSION_KEY);
+        }
+      }
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dateISO]);
+
+  useEffect(() => {
+    // Persistir sesión
+    try {
+      localStorage.setItem(
+        WORKOUT_SESSION_KEY,
+        JSON.stringify({ dateISO, started, startAtMs, offsetSec })
+      );
+    } catch {}
+  }, [dateISO, started, startAtMs, offsetSec]);
+
+  useEffect(() => {
+    if (!started) {
+      setElapsedSec(offsetSec);
+      return;
+    }
+    const compute = () => {
+      const now = Date.now();
+      const base = (startAtMs ? Math.floor((now - startAtMs) / 1000) : 0) + offsetSec;
+      setElapsedSec(base);
     };
-  }, [started]);
+    compute();
+    const id = window.setInterval(compute, 1000);
+    return () => window.clearInterval(id);
+  }, [started, startAtMs, offsetSec]);
 
   function toggleStart() {
     if (!started) {
       setStarted(true);
-      setElapsedSec(0);
+      setStartAtMs(Date.now());
     } else {
+      const now = Date.now();
+      const elapsed = (startAtMs ? Math.floor((now - startAtMs) / 1000) : 0) + offsetSec;
+      setOffsetSec(elapsed);
+      setStartAtMs(null);
       setStarted(false);
     }
   }
@@ -76,14 +116,20 @@ export default function WorkoutPage() {
 
     // Limpia estado del runner
     setStarted(false);
+    setStartAtMs(null);
+    setOffsetSec(0);
     setElapsedSec(0);
     setDone({});
+    try { localStorage.removeItem(WORKOUT_SESSION_KEY); } catch {}
   }
 
   async function quickResetSession() {
     setStarted(false);
+    setStartAtMs(null);
+    setOffsetSec(0);
     setElapsedSec(0);
     setDone({});
+    try { localStorage.removeItem(WORKOUT_SESSION_KEY); } catch {}
     setToast("Sesión reiniciada.");
   }
 

@@ -30,7 +30,7 @@
       "static/chunks/23-ae7220c84e73ed99.js",
       "static/chunks/main-app-9dace38bcd3ddf74.js",
       "static/chunks/635-9d2c2877fe386d4d.js",
-      "static/chunks/app/dojo/page-cc1b51c4fb2f790f.js"
+      "static/chunks/app/dojo/page-d33f4e083c939fe9.js"
     ],
     "/orgullo/page": [
       "static/chunks/webpack-facfb64f78722460.js",
@@ -59,15 +59,6 @@
       "static/chunks/635-9d2c2877fe386d4d.js",
       "static/chunks/app/progress/page-e169f4023e8bdb5a.js"
     ],
-    "/workout/page": [
-      "static/chunks/webpack-facfb64f78722460.js",
-      "static/chunks/fd9d1056-95542c12c8153870.js",
-      "static/chunks/23-ae7220c84e73ed99.js",
-      "static/chunks/main-app-9dace38bcd3ddf74.js",
-      "static/chunks/635-9d2c2877fe386d4d.js",
-      "static/chunks/173-32acc682beea3e86.js",
-      "static/chunks/app/workout/page-498871865f948cad.js"
-    ],
     "/settings/page": [
       "static/chunks/webpack-facfb64f78722460.js",
       "static/chunks/fd9d1056-95542c12c8153870.js",
@@ -76,6 +67,15 @@
       "static/chunks/635-9d2c2877fe386d4d.js",
       "static/chunks/173-32acc682beea3e86.js",
       "static/chunks/app/settings/page-a76bf8042e3209e5.js"
+    ],
+    "/workout/page": [
+      "static/chunks/webpack-facfb64f78722460.js",
+      "static/chunks/fd9d1056-95542c12c8153870.js",
+      "static/chunks/23-ae7220c84e73ed99.js",
+      "static/chunks/main-app-9dace38bcd3ddf74.js",
+      "static/chunks/635-9d2c2877fe386d4d.js",
+      "static/chunks/173-32acc682beea3e86.js",
+      "static/chunks/app/workout/page-4be12c8b28e6a5d5.js"
     ]
   }
 }

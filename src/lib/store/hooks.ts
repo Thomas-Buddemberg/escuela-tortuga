@@ -25,6 +25,14 @@ export function useRecentActions(limit: number = 30) {
   return actions ?? [];
 }
 
+export function useAllActions() {
+  const actions = useLiveQuery(async () => {
+    // Ordenado por fecha del día para facilitar cálculos por día
+    return await db.actions.orderBy("dateISO").toArray();
+  }, []);
+  return actions ?? [];
+}
+
 export function useWorkouts(limit: number = 30) {
   const workouts = useLiveQuery(async () => {
     const all = await db.workouts.orderBy("completedAtISO").reverse().limit(limit).toArray();
