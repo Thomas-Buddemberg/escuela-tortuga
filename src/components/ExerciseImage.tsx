@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from "react";
 
-export default function ExerciseImage({ name, size = 40, className = "" }: { name: string; size?: number; className?: string }) {
+export default function ExerciseImage({ name, size = 120, className = "" }: { name: string; size?: number; className?: string }) {
   const candidates = useMemo(() => {
     const baseNames = [
       name,

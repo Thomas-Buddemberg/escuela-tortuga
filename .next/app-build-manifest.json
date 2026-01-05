@@ -12,10 +12,17 @@
       "static/chunks/fd9d1056-d6312735b6ba44bd.js",
       "static/chunks/23-cc92a9041ecca644.js",
       "static/chunks/main-app-9dace38bcd3ddf74.js",
-      "static/css/0d636a3fc334f178.css",
+      "static/css/1727d4d9138439c2.css",
       "static/chunks/635-9d2c2877fe386d4d.js",
       "static/chunks/138-2bd96f5a8a4c825e.js",
       "static/chunks/app/layout-497c564f0116a8cc.js"
+    ],
+    "/capsule/page": [
+      "static/chunks/webpack-f1f05a309424aa6a.js",
+      "static/chunks/fd9d1056-d6312735b6ba44bd.js",
+      "static/chunks/23-cc92a9041ecca644.js",
+      "static/chunks/main-app-9dace38bcd3ddf74.js",
+      "static/chunks/app/capsule/page-a01a827c36c24bea.js"
     ],
     "/dojo/page": [
       "static/chunks/webpack-f1f05a309424aa6a.js",
@@ -23,7 +30,7 @@
       "static/chunks/23-cc92a9041ecca644.js",
       "static/chunks/main-app-9dace38bcd3ddf74.js",
       "static/chunks/635-9d2c2877fe386d4d.js",
-      "static/chunks/app/dojo/page-73a76696b2c20150.js"
+      "static/chunks/app/dojo/page-3a565f67039e7668.js"
     ],
     "/orgullo/page": [
       "static/chunks/webpack-f1f05a309424aa6a.js",
@@ -33,6 +40,16 @@
       "static/chunks/635-9d2c2877fe386d4d.js",
       "static/chunks/173-984d0880cb395e5a.js",
       "static/chunks/app/orgullo/page-b62ea30c8d2d714e.js"
+    ],
+    "/page": [
+      "static/chunks/webpack-f1f05a309424aa6a.js",
+      "static/chunks/fd9d1056-d6312735b6ba44bd.js",
+      "static/chunks/23-cc92a9041ecca644.js",
+      "static/chunks/main-app-9dace38bcd3ddf74.js",
+      "static/chunks/635-9d2c2877fe386d4d.js",
+      "static/chunks/138-2bd96f5a8a4c825e.js",
+      "static/chunks/173-984d0880cb395e5a.js",
+      "static/chunks/app/page-0c9c31f27f604265.js"
     ],
     "/progreso/page": [
       "static/chunks/webpack-f1f05a309424aa6a.js",
@@ -51,29 +68,12 @@
       "static/chunks/173-984d0880cb395e5a.js",
       "static/chunks/app/settings/page-2aa7a99698839aa4.js"
     ],
-    "/capsule/page": [
-      "static/chunks/webpack-f1f05a309424aa6a.js",
-      "static/chunks/fd9d1056-d6312735b6ba44bd.js",
-      "static/chunks/23-cc92a9041ecca644.js",
-      "static/chunks/main-app-9dace38bcd3ddf74.js",
-      "static/chunks/app/capsule/page-a01a827c36c24bea.js"
-    ],
     "/progress/page": [
       "static/chunks/webpack-f1f05a309424aa6a.js",
       "static/chunks/fd9d1056-d6312735b6ba44bd.js",
       "static/chunks/23-cc92a9041ecca644.js",
       "static/chunks/main-app-9dace38bcd3ddf74.js",
       "static/chunks/app/progress/page-ee06d49802bc04ee.js"
-    ],
-    "/page": [
-      "static/chunks/webpack-f1f05a309424aa6a.js",
-      "static/chunks/fd9d1056-d6312735b6ba44bd.js",
-      "static/chunks/23-cc92a9041ecca644.js",
-      "static/chunks/main-app-9dace38bcd3ddf74.js",
-      "static/chunks/635-9d2c2877fe386d4d.js",
-      "static/chunks/138-2bd96f5a8a4c825e.js",
-      "static/chunks/173-984d0880cb395e5a.js",
-      "static/chunks/app/page-0c9c31f27f604265.js"
     ],
     "/workout/page": [
       "static/chunks/webpack-f1f05a309424aa6a.js",
@@ -82,7 +82,7 @@
       "static/chunks/main-app-9dace38bcd3ddf74.js",
       "static/chunks/635-9d2c2877fe386d4d.js",
       "static/chunks/173-984d0880cb395e5a.js",
-      "static/chunks/app/workout/page-1717ba4eb6d91100.js"
+      "static/chunks/app/workout/page-dd0b8f582457f2d2.js"
     ]
   }
 }
