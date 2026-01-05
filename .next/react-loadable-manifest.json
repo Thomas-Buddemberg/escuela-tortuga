@@ -1,1 +1,8 @@
-{}
+{
+  "components/Navbar.tsx -> ./BackgroundTimerIndicator": {
+    "id": 5602,
+    "files": [
+      "static/chunks/602.fcb90366fa67a15b.js"
+    ]
+  }
+}

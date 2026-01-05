@@ -52,18 +52,27 @@ export default function DojoPage() {
                 ].join(" ")}
               >
                 <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <div className="text-sm font-semibold">{e.name}</div>
-                    <div className="text-xs text-white/60">
-                      {spec} • descanso {e.restSec}s • min KI {e.minKi}
-                    </div>
-                    {e.description ? (
-                      <div className="mt-1 text-xs text-white/70">
-                        {e.description}
+                  <div className="flex items-start gap-3">
+                    <img
+                      src={`/assets/${encodeURIComponent(e.name)}.png`}
+                      alt={e.name}
+                      className="h-10 w-10 flex-shrink-0 rounded-lg border border-white/10 bg-black/30 object-cover"
+                      loading="lazy"
+                      onError={(ev) => { (ev.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                    />
+                    <div>
+                      <div className="text-sm font-semibold">{e.name}</div>
+                      <div className="text-xs text-white/60">
+                        {spec} • descanso {e.restSec}s • min KI {e.minKi}
                       </div>
-                    ) : null}
-                    <div className="mt-1 text-[11px] text-white/55">
-                      Tags: {e.tags.join(", ")}
+                      {e.description ? (
+                        <div className="mt-1 text-xs text-white/70">
+                          {e.description}
+                        </div>
+                      ) : null}
+                      <div className="mt-1 text-[11px] text-white/55">
+                        Tags: {e.tags.join(", ")}
+                      </div>
                     </div>
                   </div>
                   <div className="text-xs">

@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{}";
+self.__REACT_LOADABLE_MANIFEST='{"components/Navbar.tsx -> ./BackgroundTimerIndicator":{"id":5602,"files":["static/chunks/602.fcb90366fa67a15b.js"]}}';

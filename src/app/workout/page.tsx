@@ -224,18 +224,27 @@ export default function WorkoutPage() {
                   return (
                     <div key={ex.id} className="rounded-xl border border-white/10 bg-white/5 p-3">
                       <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <div className="text-sm font-semibold">{ex.name}</div>
-                          <div className="text-xs text-white/60">
-                            {label} • descanso {ex.restSec}s
+                        <div className="flex items-start gap-3">
+                          <img
+                            src={`/assets/${encodeURIComponent(ex.name)}.png`}
+                            alt={ex.name}
+                            className="h-10 w-10 flex-shrink-0 rounded-lg border border-white/10 bg-black/30 object-cover"
+                            loading="lazy"
+                            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                          />
+                          <div>
+                            <div className="text-sm font-semibold">{ex.name}</div>
+                            <div className="text-xs text-white/60">
+                              {label} • descanso {ex.restSec}s
+                            </div>
+                            {ex.tips?.length ? (
+                              <ul className="mt-1 list-disc pl-5 text-[11px] text-white/55">
+                                {ex.tips.map((t) => (
+                                  <li key={t}>{t}</li>
+                                ))}
+                              </ul>
+                            ) : null}
                           </div>
-                          {ex.tips?.length ? (
-                            <ul className="mt-1 list-disc pl-5 text-[11px] text-white/55">
-                              {ex.tips.map((t) => (
-                                <li key={t}>{t}</li>
-                              ))}
-                            </ul>
-                          ) : null}
                         </div>
 
                         <div className="flex items-center gap-2">
