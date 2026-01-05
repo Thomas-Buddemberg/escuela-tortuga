@@ -10,7 +10,16 @@ const withPWA = require('next-pwa')({
 });
 
 const nextConfig = {
-  reactStrictMode: true
+  reactStrictMode: true,
+  async redirects() {
+    return [
+      {
+        source: '/progress',
+        destination: '/progreso',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 module.exports = withPWA(nextConfig);
