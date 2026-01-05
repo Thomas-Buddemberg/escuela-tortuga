@@ -4,6 +4,7 @@ import Card from "@/components/Card";
 import { useMemo, useState } from "react";
 import { usePlayer } from "@/lib/store/hooks";
 import { EXERCISES } from "@/lib/game/exercises";
+import ExerciseImage from "@/components/ExerciseImage";
 
 export default function DojoPage() {
   const { player, settings, loading } = usePlayer();
@@ -53,13 +54,7 @@ export default function DojoPage() {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-start gap-3">
-                    <img
-                      src={`/assets/${encodeURIComponent(e.name)}.png`}
-                      alt={e.name}
-                      className="h-10 w-10 flex-shrink-0 rounded-lg border border-white/10 bg-black/30 object-cover"
-                      loading="lazy"
-                      onError={(ev) => { (ev.currentTarget as HTMLImageElement).style.display = 'none'; }}
-                    />
+                    <ExerciseImage name={e.name} />
                     <div>
                       <div className="text-sm font-semibold">{e.name}</div>
                       <div className="text-xs text-white/60">

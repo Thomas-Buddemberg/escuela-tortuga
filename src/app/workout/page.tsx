@@ -12,6 +12,7 @@ import { completeWorkout } from "@/lib/store/game";
 import { db } from "@/lib/db/db";
 import { completeQuest } from "@/lib/store/quests";
 import { formatSeconds, cn } from "@/lib/ui";
+import ExerciseImage from "@/components/ExerciseImage";
 
 type Mode = "quick" | "full";
 
@@ -225,13 +226,7 @@ export default function WorkoutPage() {
                     <div key={ex.id} className="rounded-xl border border-white/10 bg-white/5 p-3">
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex items-start gap-3">
-                          <img
-                            src={`/assets/${encodeURIComponent(ex.name)}.png`}
-                            alt={ex.name}
-                            className="h-10 w-10 flex-shrink-0 rounded-lg border border-white/10 bg-black/30 object-cover"
-                            loading="lazy"
-                            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
-                          />
+                          <ExerciseImage name={ex.name} />
                           <div>
                             <div className="text-sm font-semibold">{ex.name}</div>
                             <div className="text-xs text-white/60">
