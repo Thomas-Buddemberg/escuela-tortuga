@@ -19,10 +19,11 @@ import { cn, formatSeconds } from "@/lib/ui";
 
 type Variant = "capsule_30" | "capsule_60";
 
-function useCountdown(variant: Variant, active: boolean) {
+function useCountdown(variant: Variant) {
   const base = variant === "capsule_60" ? 3600 : 1800; // 60 min o 30 min
   const [remaining, setRemaining] = useState<number>(base);
   const [endAtMs, setEndAtMs] = useState<number | null>(null);
+  const [isActive, setIsActive] = useState<boolean>(false);
   const date = todayISO();
   const storageKey = `capsuleTimerV1_${variant}`;
 
@@ -33,51 +34,46 @@ function useCountdown(variant: Variant, active: boolean) {
       if (raw) {
         const d = JSON.parse(raw);
         if (d && d.dateISO === date) {
-          setRemaining(typeof d.remaining === "number" ? d.remaining : base);
-          setEndAtMs(typeof d.endAtMs === "number" ? d.endAtMs : null);
+          const persistedRemaining = typeof d.remaining === "number" ? d.remaining : base;
+          const persistedEndAt = typeof d.endAtMs === "number" ? d.endAtMs : null;
+          setRemaining(persistedRemaining);
+          setEndAtMs(persistedEndAt);
+          setIsActive(!!persistedEndAt && persistedEndAt > Date.now());
         } else {
           localStorage.removeItem(storageKey);
           setRemaining(base);
           setEndAtMs(null);
+          setIsActive(false);
         }
       } else {
         setRemaining(base);
         setEndAtMs(null);
+        setIsActive(false);
       }
     } catch {
       setRemaining(base);
       setEndAtMs(null);
+      setIsActive(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storageKey, date, base]);
 
-  // Arrancar/pausar según "active"
+  // Tick hacia abajo cuando activo
   useEffect(() => {
-    if (active) {
-      setEndAtMs(Date.now() + remaining * 1000);
-    } else {
-      if (endAtMs) {
-        const now = Date.now();
-        const r = Math.max(0, Math.floor((endAtMs - now) / 1000));
-        setRemaining(r);
-        setEndAtMs(null);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [active]);
-
-  // Tick hacia abajo
-  useEffect(() => {
-    if (!active) return;
+    if (!isActive || !endAtMs) return;
     const compute = () => {
       const now = Date.now();
-      const r = endAtMs ? Math.max(0, Math.floor((endAtMs - now) / 1000)) : remaining;
+      const r = Math.max(0, Math.floor((endAtMs - now) / 1000));
       setRemaining(r);
+      if (r <= 0) {
+        setIsActive(false);
+        setEndAtMs(null);
+      }
     };
     compute();
     const id = window.setInterval(compute, 1000);
     return () => window.clearInterval(id);
-  }, [active, endAtMs]);
+  }, [isActive, endAtMs]);
 
   // Persistir
   useEffect(() => {
@@ -86,12 +82,28 @@ function useCountdown(variant: Variant, active: boolean) {
     } catch {}
   }, [storageKey, date, remaining, endAtMs]);
 
+  const start = () => {
+    if (isActive) return;
+    setEndAtMs(Date.now() + remaining * 1000);
+    setIsActive(true);
+  };
+  const pause = () => {
+    if (!isActive) return;
+    if (endAtMs) {
+      const r = Math.max(0, Math.floor((endAtMs - Date.now()) / 1000));
+      setRemaining(r);
+    }
+    setEndAtMs(null);
+    setIsActive(false);
+  };
   const reset = () => {
     setRemaining(base);
     setEndAtMs(null);
+    setIsActive(false);
     try { localStorage.removeItem(storageKey); } catch {}
   };
-  return { remaining, base, reset };
+
+  return { remaining, base, isActive, start, pause, reset };
 }
 
 function CapsulePlan({ variant }: { variant: Variant }) {
@@ -169,34 +181,17 @@ function CapsulePlan({ variant }: { variant: Variant }) {
 export default function OrgulloPage() {
   const { player, settings, loading } = usePlayer();
   const [variant, setVariant] = useState<Variant>("capsule_30");
-  const [started, setStarted] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
-  const { remaining, base, reset } = useCountdown(variant, started);
+  const { remaining, base, isActive, start, pause, reset } = useCountdown(variant);
 
   const dateISO = todayISO();
-  const storageKey = `capsuleTimerV1_${variant}`;
 
-  // Si había un temporizador activo y no ha expirado, reanudar automáticamente
+  // Notificar fin de tiempo (hook deja de estar activo solo cuando llega a 0)
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(storageKey);
-      if (raw) {
-        const d = JSON.parse(raw);
-        if (d && d.dateISO === dateISO && typeof d.endAtMs === "number" && d.endAtMs > Date.now()) {
-          setStarted(true);
-        }
-      }
-    } catch {}
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [storageKey, dateISO]);
-
-  // Notificar fin de tiempo
-  useEffect(() => {
-    if (started && remaining === 0) {
-      setStarted(false);
+    if (!isActive && remaining === 0) {
       setToast("Tiempo cumplido ✅");
     }
-  }, [started, remaining]);
+  }, [isActive, remaining]);
 
   if (loading || !player || !settings) {
     return (
@@ -218,7 +213,7 @@ export default function OrgulloPage() {
     });
 
     setToast(res.message);
-    setStarted(false);
+    pause();
     reset();
   }
 
@@ -251,10 +246,10 @@ export default function OrgulloPage() {
               <span className="text-white/70">Tiempo restante:</span> <span className="font-semibold">{formatSeconds(remaining)}</span>
             </div>
             <div className="flex gap-2">
-              <Button variant="secondary" onClick={() => setStarted((s) => !s)}>
-                {started ? "Pausar" : "Iniciar"}
+              <Button variant="secondary" onClick={() => (isActive ? pause() : start())}>
+                {isActive ? "Pausar" : "Iniciar"}
               </Button>
-              <Button variant="ghost" onClick={() => { setStarted(false); reset(); }}>
+              <Button variant="ghost" onClick={() => { pause(); reset(); }}>
                 Reiniciar
               </Button>
             </div>

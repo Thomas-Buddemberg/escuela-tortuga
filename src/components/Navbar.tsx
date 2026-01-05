@@ -2,6 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import dynamic from "next/dynamic";
+
+const BackgroundTimerIndicator = dynamic(() => import("./BackgroundTimerIndicator"), { ssr: false });
 
 const tabs = [
   { href: "/", label: "Inicio" },
@@ -33,7 +36,7 @@ export default function Navbar() {
           </div>
         </Link>
 
-        <nav className="hidden gap-1 sm:flex">
+        <nav className="hidden items-center gap-2 sm:flex">
           {tabs.map((t) => {
             const active = isActive(pathname, t.href);
             return (
@@ -49,12 +52,17 @@ export default function Navbar() {
               </Link>
             );
           })}
+          <BackgroundTimerIndicator className="hidden sm:inline-flex" />
         </nav>
       </div>
 
       {/* Mobile bottom nav */}
       <div className="sm:hidden">
-        <div className="fixed bottom-3 left-0 right-0 z-50">
+        {/* Indicador móvil (flotante) */}
+        <div className="fixed bottom-16 left-0 right-0 z-50 flex justify-center px-3">
+          <BackgroundTimerIndicator className="inline-flex sm:hidden" />
+        </div>
+        <div className="fixed bottom-3 left-0 right-0 z-40">
           <div className="mx-auto flex max-w-3xl justify-between gap-1 px-3">
             <div className="flex w-full justify-between rounded-2xl border border-white/10 bg-[#0b0f1a]/70 p-1 backdrop-blur shadow-soft">
               {tabs.map((t) => {
