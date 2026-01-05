@@ -32,15 +32,6 @@
       "static/chunks/635-9d2c2877fe386d4d.js",
       "static/chunks/app/dojo/page-8a145625ae20c97a.js"
     ],
-    "/orgullo/page": [
-      "static/chunks/webpack-facfb64f78722460.js",
-      "static/chunks/fd9d1056-d6312735b6ba44bd.js",
-      "static/chunks/23-cc92a9041ecca644.js",
-      "static/chunks/main-app-9dace38bcd3ddf74.js",
-      "static/chunks/635-9d2c2877fe386d4d.js",
-      "static/chunks/173-984d0880cb395e5a.js",
-      "static/chunks/app/orgullo/page-cf565077ab3926ae.js"
-    ],
     "/page": [
       "static/chunks/webpack-facfb64f78722460.js",
       "static/chunks/fd9d1056-d6312735b6ba44bd.js",
@@ -50,6 +41,15 @@
       "static/chunks/138-2bd96f5a8a4c825e.js",
       "static/chunks/173-984d0880cb395e5a.js",
       "static/chunks/app/page-0c9c31f27f604265.js"
+    ],
+    "/orgullo/page": [
+      "static/chunks/webpack-facfb64f78722460.js",
+      "static/chunks/fd9d1056-d6312735b6ba44bd.js",
+      "static/chunks/23-cc92a9041ecca644.js",
+      "static/chunks/main-app-9dace38bcd3ddf74.js",
+      "static/chunks/635-9d2c2877fe386d4d.js",
+      "static/chunks/173-984d0880cb395e5a.js",
+      "static/chunks/app/orgullo/page-cf565077ab3926ae.js"
     ],
     "/progreso/page": [
       "static/chunks/webpack-facfb64f78722460.js",

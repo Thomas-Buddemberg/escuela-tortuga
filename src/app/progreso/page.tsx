@@ -20,14 +20,6 @@ export default function ProgressPage() {
   const current = useMemo(() => (player ? getTransformation(player.kiTotal) : null), [player]);
   const prog = useMemo(() => (player ? progressToNext(player.kiTotal) : null), [player]);
 
-  if (loading || !player || !settings || !current || !prog) {
-    return (
-      <div className="space-y-4">
-        <Card title="Cargando progreso..." />
-      </div>
-    );
-  }
-
   // Serie continua histórica por día (incluye días con 0 KI)
   const today = todayISO();
   const byDateSum = useMemo(() => {
@@ -67,6 +59,14 @@ export default function ProgressPage() {
       return { x: p.x, y: acc, dateISO: p.dateISO } as any;
     });
   }, [dailySeries]);
+
+  if (loading || !player || !settings || !current || !prog) {
+    return (
+      <div className="space-y-4">
+        <Card title="Cargando progreso..." />
+      </div>
+    );
+  }
 
 
   return (
